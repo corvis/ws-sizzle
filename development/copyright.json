@@ -1,0 +1,11 @@
+{
+    "author": "Dmitry Berezovsky",
+    "back": false,
+    "exclude": "",
+    "include": "*.py",
+    "license": "mit",
+    "program": "WS Sizzle",
+    "short": "sizzlews",
+    "single": true,
+    "year": "2020"
+}
