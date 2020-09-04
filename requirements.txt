@@ -1,6 +1,7 @@
 json-rpc>=1.13.0
 
 # Not actual library dependencies
+pydantic>=1.6
 tornado
 websockets
 

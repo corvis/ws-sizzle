@@ -21,19 +21,3 @@
 #    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import asyncio
-
-from sizzlews.server.common import SizzleWSHandler, ClassBasedSizzleWSHandler
-from sizzlews.server.tornado import bootstrap_torando_rpc_application
-
-
-class MyApi(ClassBasedSizzleWSHandler):
-    METHOD_PREFXIX = "api."
-
-    async def some_method(self, a: int, b):
-        await asyncio.sleep(2)
-        return a + b
-
-
-if __name__ == "__main__":
-    bootstrap_torando_rpc_application(MyApi(), url_path='/rpc')

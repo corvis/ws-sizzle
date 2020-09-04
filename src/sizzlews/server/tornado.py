@@ -21,6 +21,7 @@
 #    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import asyncio
 from typing import Any, Optional, Awaitable
 
 import tornado.web
@@ -43,8 +44,8 @@ class TornadoHttpSizzleWSHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
         self.set_header("Content-Type", 'application/json')
 
-    def post(self):
-        self.write(self._api_handler.handle(self.request.body, str(self.request.body)))
+    async def post(self):
+        self.write(await self._api_handler.handle(self.request.body, str(self.request.body)))
 
 
 def bootstrap_torando_rpc_application(api_handler: SizzleWSHandler, port=8888, url_path='/'):
@@ -52,5 +53,6 @@ def bootstrap_torando_rpc_application(api_handler: SizzleWSHandler, port=8888, u
         (url_path, TornadoHttpSizzleWSHandler, dict(api_handler=api_handler))
     ])
     app.listen(port)
-    tornado.ioloop.IOLoop.current().start()
+    if not asyncio.get_event_loop().is_running():
+        tornado.ioloop.IOLoop.current().start()
     return app

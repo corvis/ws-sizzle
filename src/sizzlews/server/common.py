@@ -20,16 +20,19 @@
 #    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 #    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+import datetime
 import json
 import types
 from abc import ABCMeta, abstractmethod
+from json import JSONEncoder
 from typing import Callable
 
 from jsonrpc import Dispatcher, JSONRPCResponseManager
 from jsonrpc.exceptions import JSONRPCInvalidRequest, JSONRPCInvalidRequestException, JSONRPCParseError
 from jsonrpc.jsonrpc import JSONRPCRequest
 from jsonrpc.jsonrpc2 import JSONRPC20Response
+
+from sizzlews.jsonrpc.manager import JSONRPCResponseAsyncManager
 
 API_METHOD_VERSION = 'version'
 API_METHOD_PING = 'ping'
@@ -47,12 +50,19 @@ class SizzleWSSession(object):
         return self.__id
 
 
+class SizzleWSJsonEncoder(JSONEncoder):
+
+    def default(self, o):
+        if isinstance(o, datetime.datetime):
+            return o.isoformat()
+
+
 class SizzleWSHandler(object):
 
     def __init__(self, dispatcher: Dispatcher = None, expose_version_api=True, expose_ping_api=True) -> None:
         self.dispatcher = dispatcher or Dispatcher()
         self.__api_version = None  # type: str
-        self.encoder = json.JSONEncoder()
+        self.encoder = SizzleWSJsonEncoder()
         if expose_version_api:
             self.dispatcher[API_METHOD_VERSION] = self.m_get_version
         if expose_ping_api:
@@ -80,7 +90,7 @@ class SizzleWSHandler(object):
     def _build_response_str(self, response: JSONRPC20Response):
         return self.encoder.encode(response.data)
 
-    def handle(self, request_str, ctx: object) -> str:
+    async def handle(self, request_str, ctx: object) -> str:
         try:
             request = self._parse_request(request_str)
         except (TypeError, ValueError):
@@ -91,7 +101,7 @@ class SizzleWSHandler(object):
         # TODO: Middleware
         # TODO: Auth
 
-        return self._build_response_str(JSONRPCResponseManager.handle_request(request, self.dispatcher))
+        return self._build_response_str(await JSONRPCResponseAsyncManager.handle_request(request, self.dispatcher))
 
 
 class BidirectionalSizzleWSSession(SizzleWSSession):
