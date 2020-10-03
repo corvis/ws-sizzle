@@ -4,8 +4,12 @@ json-rpc>=1.13.0
 pydantic>=1.6
 tornado
 websockets
+requests
+aiohttp
 
 # Development dependencies
 copyright==1.0.1.0
 twine==1.13.0
 m2r==0.2.1
+flake8==3.8.4
+pytest==6.1.1

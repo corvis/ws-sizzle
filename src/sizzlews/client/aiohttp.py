@@ -21,33 +21,27 @@
 #    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import asyncio
+import aiohttp
 
-import pydantic
-
-from sizzlews.server.common import SizzleWSHandler, ClassBasedSizzleWSHandler
-from sizzlews.server.tornado import bootstrap_torando_rpc_application
+from sizzlews.client.common import JsonRpcRequest, InvocationResultType, SizzleWsAsyncClient
 
 
-class MyDTO(pydantic.BaseModel):
-    field1: int
-    field2: str
+class SizzleWsAIOClient(SizzleWsAsyncClient):
 
+    def __init__(self, endpoint: str = None) -> None:
+        super().__init__()
+        self.endpoint = endpoint
+        self._session: aiohttp.ClientSession = None
 
-class MyApi(ClassBasedSizzleWSHandler):
-    METHOD_PREFXIX = "api."
+    async def init(self):
+        self._session = aiohttp.ClientSession()
 
-    async def some_method(self, a: int, b):
-        await asyncio.sleep(0.1)
-        return a + b
+    async def close(self):
+        if self._session:
+            await self._session.close()
 
-    async def divide_by_zero(self, a: int):
-        await asyncio.sleep(0.1)
-        return 1 / 0
-
-    async def my_dto_method(self):
-        return MyDTO(field1=1, field2='str')
-
-
-if __name__ == "__main__":
-    bootstrap_torando_rpc_application(MyApi(), url_path='/rpc')
+    async def _invoke_request(self, rq: JsonRpcRequest, expected_response_type: InvocationResultType = None):
+        if self._session is None:
+            raise ValueError('Client is not initialized. Call init before use')
+        response = await self._session.post(self.endpoint, json=rq.to_dict())
+        return self._parse_rpc_response(await response.json(), expected_response_type)

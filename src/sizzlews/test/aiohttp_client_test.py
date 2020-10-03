@@ -25,8 +25,8 @@ import asyncio
 
 import pydantic
 
-from sizzlews.server.common import SizzleWSHandler, ClassBasedSizzleWSHandler
-from sizzlews.server.tornado import bootstrap_torando_rpc_application
+from sizzlews.client.aiohttp import SizzleWsAIOClient
+from sizzlews.client.common import RPCInvocationError
 
 
 class MyDTO(pydantic.BaseModel):
@@ -34,20 +34,34 @@ class MyDTO(pydantic.BaseModel):
     field2: str
 
 
-class MyApi(ClassBasedSizzleWSHandler):
-    METHOD_PREFXIX = "api."
+class MyTestApiClient(SizzleWsAIOClient):
 
-    async def some_method(self, a: int, b):
-        await asyncio.sleep(0.1)
-        return a + b
+    async def some_method(self, a: int, b: int):
+        return await self.async_invoke('api.some_method', a, b)
 
     async def divide_by_zero(self, a: int):
-        await asyncio.sleep(0.1)
-        return 1 / 0
+        return await self.async_invoke('api.divide_by_zero', a)
 
     async def my_dto_method(self):
-        return MyDTO(field1=1, field2='str')
+        return await self.async_invoke('api.my_dto_method', expected_response_type=MyDTO)
+
+
+client = MyTestApiClient('http://localhost:8888/rpc')
+
+
+async def main():
+    async with client:
+        print(await client.some_method(1, 2))
+        try:
+            print(await client.divide_by_zero(1))
+        except RPCInvocationError as e:
+            print("Error: " + e.msg)
+        try:
+            print(await client.my_dto_method())
+        except Exception as e:
+            print(e)
 
 
 if __name__ == "__main__":
-    bootstrap_torando_rpc_application(MyApi(), url_path='/rpc')
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())

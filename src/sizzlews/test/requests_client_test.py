@@ -21,33 +21,16 @@
 #    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import asyncio
-
-import pydantic
-
-from sizzlews.server.common import SizzleWSHandler, ClassBasedSizzleWSHandler
-from sizzlews.server.tornado import bootstrap_torando_rpc_application
+from sizzlews.client.requests import SizzleWsHttpClient
 
 
-class MyDTO(pydantic.BaseModel):
-    field1: int
-    field2: str
+class MyTestApiClient(SizzleWsHttpClient):
+
+    def some_method(self, a: int, b: int):
+        return self.invoke('api.some_method', a, b)
 
 
-class MyApi(ClassBasedSizzleWSHandler):
-    METHOD_PREFXIX = "api."
-
-    async def some_method(self, a: int, b):
-        await asyncio.sleep(0.1)
-        return a + b
-
-    async def divide_by_zero(self, a: int):
-        await asyncio.sleep(0.1)
-        return 1 / 0
-
-    async def my_dto_method(self):
-        return MyDTO(field1=1, field2='str')
-
+client = MyTestApiClient('http://localhost:8888/rpc')
 
 if __name__ == "__main__":
-    bootstrap_torando_rpc_application(MyApi(), url_path='/rpc')
+    print(client.some_method(1, 2))

@@ -24,6 +24,8 @@
 import inspect
 import json
 import logging
+
+import pydantic
 from jsonrpc.utils import is_invalid_params
 from jsonrpc.exceptions import (
     JSONRPCInvalidParams,
@@ -138,6 +140,8 @@ class JSONRPCResponseAsyncManager(object):
                     result = method(*request.args, **request.kwargs)
                     if inspect.isawaitable(result):
                         result = await result
+                    if isinstance(result, pydantic.BaseModel):
+                        result = result.dict()
                 except JSONRPCDispatchException as e:
                     output = make_response(error=e.error._data)
                 except Exception as e:

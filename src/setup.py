@@ -91,6 +91,8 @@ setup(
     extras_require={
         'tornado': ['tornado'],
         'websockets': ['websockets'],
+        'requests-client': ['requests'],
+        'aiohttp': ['aiohttp']
     },
 
 )

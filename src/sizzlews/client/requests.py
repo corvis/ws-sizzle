@@ -21,33 +21,20 @@
 #    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import asyncio
+import requests
 
-import pydantic
-
-from sizzlews.server.common import SizzleWSHandler, ClassBasedSizzleWSHandler
-from sizzlews.server.tornado import bootstrap_torando_rpc_application
+from sizzlews.client.common import SizzleWsClient, JsonRpcRequest, InvocationResultType
 
 
-class MyDTO(pydantic.BaseModel):
-    field1: int
-    field2: str
+class SizzleWsHttpClient(SizzleWsClient):
+    def __init__(self, endpoint: str = None) -> None:
+        super().__init__()
+        self.endpoint = endpoint
 
+    def _invoke_request(self, rq: JsonRpcRequest, expected_response_type: InvocationResultType = None):
+        if self.endpoint is None:
+            raise ValueError("Endpoint must be configured before any invocation")
+        return self._parse_rpc_response(requests.post(self.endpoint, json=rq.to_dict()).json(), expected_response_type)
 
-class MyApi(ClassBasedSizzleWSHandler):
-    METHOD_PREFXIX = "api."
-
-    async def some_method(self, a: int, b):
-        await asyncio.sleep(0.1)
-        return a + b
-
-    async def divide_by_zero(self, a: int):
-        await asyncio.sleep(0.1)
-        return 1 / 0
-
-    async def my_dto_method(self):
-        return MyDTO(field1=1, field2='str')
-
-
-if __name__ == "__main__":
-    bootstrap_torando_rpc_application(MyApi(), url_path='/rpc')
+    async def _async_invoke_request(self, rq: JsonRpcRequest, expected_response_type: InvocationResultType = None):
+        raise NotImplementedError()
