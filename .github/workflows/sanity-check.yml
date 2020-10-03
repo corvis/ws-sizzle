@@ -21,19 +21,10 @@ jobs:
         pip install -r requirements.txt
 
     - name: Apply copyright
-      run: ./development/copyright-update
+      run: make copyright
       
     - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 ./src --count --show-source --statistics
-    
-    - name: Commit changes
-      uses: EndBug/add-and-commit@v5
-      with:
-        author_name: CrowBot
-        author_email: crowbot@nothing.com
-        message: "Your commit message"
-        add: "*.py"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: make flake8
+
+    - name: Lint with flake8
+      run: make test
