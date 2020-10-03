@@ -10,10 +10,10 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v2
     
-    - name: Set up Python ${{ env.USE_PYTHON_VERSION }}
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ env.USE_PYTHON_VERSION }}
+        python-version: 3.7
     
     - name: Install dependencies
       run: |
@@ -37,4 +37,3 @@ jobs:
         add: "*.py"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        USE_PYTHON_VERSION: 3.7
