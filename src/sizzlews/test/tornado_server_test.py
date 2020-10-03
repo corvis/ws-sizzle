@@ -25,7 +25,7 @@ import asyncio
 
 import pydantic
 
-from sizzlews.server.common import SizzleWSHandler, ClassBasedSizzleWSHandler
+from sizzlews.server.common import ClassBasedSizzleWSHandler
 from sizzlews.server.tornado import bootstrap_torando_rpc_application
 
 

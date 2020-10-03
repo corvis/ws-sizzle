@@ -23,12 +23,11 @@
 
 import datetime
 import json
-import types
 from abc import ABCMeta, abstractmethod
 from json import JSONEncoder
 from typing import Callable
 
-from jsonrpc import Dispatcher, JSONRPCResponseManager
+from jsonrpc import Dispatcher
 from jsonrpc.exceptions import JSONRPCInvalidRequest, JSONRPCInvalidRequestException, JSONRPCParseError
 from jsonrpc.jsonrpc import JSONRPCRequest
 from jsonrpc.jsonrpc2 import JSONRPC20Response
@@ -133,7 +132,7 @@ class BiDirectionalSizzleWSHandler(SizzleWSHandler, metaclass=ABCMeta):
             if session_filter is not None and session_filter(session):
                 try:
                     self.post_message(message, session)
-                except:
+                except Exception:
                     # TODO: Log failure
                     pass
 

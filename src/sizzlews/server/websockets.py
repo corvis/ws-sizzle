@@ -22,7 +22,6 @@
 #    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import asyncio
-from typing import Callable, Awaitable
 
 import websockets
 from websockets import WebSocketServerProtocol

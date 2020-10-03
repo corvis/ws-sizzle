@@ -26,7 +26,7 @@ from typing import Callable
 from sizzlews.server.common import ANNOTATIONS_IGNORE_PREFIX_PROPERTY, ANNOTATIONS_RPC_METHOD_PROPERTY
 
 
-def rpc_method(func: Callable, api_name: str = None, ignore_prefix = False):
+def rpc_method(func: Callable, api_name: str = None, ignore_prefix=False):
     setattr(func, ANNOTATIONS_RPC_METHOD_PROPERTY, api_name or func.__name__)
     setattr(func, ANNOTATIONS_IGNORE_PREFIX_PROPERTY, ignore_prefix)
     return func

@@ -26,7 +26,6 @@ import json
 import logging
 
 import pydantic
-from jsonrpc.utils import is_invalid_params
 from jsonrpc.exceptions import (
     JSONRPCInvalidParams,
     JSONRPCInvalidRequest,
@@ -36,13 +35,14 @@ from jsonrpc.exceptions import (
     JSONRPCServerError,
     JSONRPCDispatchException,
 )
+from jsonrpc.jsonrpc import JSONRPCRequest
 from jsonrpc.jsonrpc1 import JSONRPC10Response
 from jsonrpc.jsonrpc2 import (
     JSONRPC20BatchRequest,
     JSONRPC20BatchResponse,
     JSONRPC20Response,
 )
-from jsonrpc.jsonrpc import JSONRPCRequest
+from jsonrpc.utils import is_invalid_params
 
 logger = logging.getLogger(__name__)
 
@@ -113,8 +113,8 @@ class JSONRPCResponseAsyncManager(object):
         else:
             return responses[0]
 
-    @classmethod
-    async def _get_responses(cls, requests, dispatcher):
+    @classmethod  # noqa: C901
+    async def _get_responses(cls, requests, dispatcher):  # noqa: C901
         """ Response to each single JSON-RPC Request.
 
         :return iterator(JSONRPC20Response):

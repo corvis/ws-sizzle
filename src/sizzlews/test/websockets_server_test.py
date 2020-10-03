@@ -23,11 +23,9 @@
 
 import asyncio
 
-import websockets
-
 from sizzlews.server.annotation import rpc_method
-from sizzlews.server.common import ClassBasedSizzleWSHandler, SizzleWSHandler, MethodDiscoveryMixin
-from sizzlews.server.websockets import WebsocketsSizzleWSHandler, bootstrap_websockets_rpc_application
+from sizzlews.server.common import SizzleWSHandler, MethodDiscoveryMixin
+from sizzlews.server.websockets import bootstrap_websockets_rpc_application
 
 
 class MyApi(MethodDiscoveryMixin, SizzleWSHandler):

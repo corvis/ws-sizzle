@@ -22,13 +22,13 @@
 #    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import asyncio
-from typing import Any, Optional, Awaitable
+from typing import Any
 
+import tornado.ioloop
 import tornado.web
 from tornado import httputil
-import tornado.ioloop
 
-from sizzlews.server.common import SizzleWSHandler, ClassBasedSizzleWSHandler
+from sizzlews.server.common import SizzleWSHandler
 
 
 class TornadoHttpSizzleWSHandler(tornado.web.RequestHandler):
