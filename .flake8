@@ -15,7 +15,9 @@ exclude =
 
 ignore =
     # W291 trailing whitespace
-    W291
+    W291,
+    # W391 blank line at end of file
+    W391
 
 per-file-ignores =
     # imported but unused
