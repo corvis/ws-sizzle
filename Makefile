@@ -10,7 +10,9 @@ VIRTUAL_ENV_PATH=venv
 SKIP_VENV="${NO_VENV}"
 SETUP_MODULE=setup.py
 
-all: copyright flake8
+.DEFAULT_GOAL := pre_commit
+
+pre_commit: copyright flake8
 
 help:
 	@echo "Usage:"
