@@ -84,6 +84,7 @@ setup(
     # Mandatory requirements
     install_requires=[
         'json-rpc>=1.13.0',
+        'pydantic>=1.6',
         'typing>=3.6',
     ],
     # Extra dependencies might be installed with:

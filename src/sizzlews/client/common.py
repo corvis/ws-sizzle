@@ -24,7 +24,7 @@
 import json
 import logging
 from abc import ABCMeta, abstractmethod
-from typing import Union, Any, Dict, List, Type
+from typing import Union, Any, Dict, List, Type, Optional
 
 import pydantic
 
@@ -58,17 +58,44 @@ class JsonRpcRequest(object):
         return json.dumps(self.to_dict())
 
 
+class RPCSourceError(Exception):
+
+    def __init__(self, msg: str, type: str, args: List[Any]) -> None:
+        super().__init__(msg)
+        self.type: str = type
+        self.msg: str = msg
+        self.args: List[Any] = args
+
+
 class RPCInvocationError(Exception):
 
     def __init__(self, msg: str, code: int, data: Dict) -> None:
         super().__init__(msg)
-        self.msg = msg
-        self.code = code
-        self.data = data
+        self.msg: str = msg
+        self.code: int = code
+        self.data: Dict = data
+        self.error: Optional[RPCSourceError] = None
+
+        # If there is data field - try to parse it
+        if data is not None:
+            self.error = RPCSourceError(
+                msg=data.get('message', 'Unknown error'),
+                type=data.get('type', 'UNKNOWN'),
+                args=data.get('args', []),
+            )
 
     @classmethod
     def from_rpc_dict(cls, rpc_dict: dict) -> 'RPCInvocationError':
         return cls(rpc_dict['message'], rpc_dict['code'], rpc_dict.get('data', None))
+
+    def __repr__(self) -> str:
+        if self.error is None:
+            return self.msg
+        return 'RPC Invocation error {}: {}. Cause: {}: {}'.format(str(self.code), self.msg, self.error.type,
+                                                                   self.error.msg)
+
+    def __str__(self):
+        return self.__repr__()
 
 
 class SizzleWsBaseClient(metaclass=ABCMeta):
