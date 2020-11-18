@@ -22,6 +22,7 @@
 #    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import asyncio
+from typing import List
 
 import pydantic
 
@@ -45,6 +46,9 @@ class MyTestApiClient(SizzleWsAIOClient):
     async def my_dto_method(self):
         return await self.async_invoke('api.my_dto_method', expected_response_type=MyDTO)
 
+    async def returns_list_of_dtos(self) -> List[MyDTO]:
+        return await self.async_invoke('api.returns_list_of_dtos', expected_response_type=MyDTO)
+
 
 client = MyTestApiClient('http://localhost:8888/rpc')
 
@@ -58,6 +62,11 @@ async def main():
             print("Error: " + e.msg)
         try:
             print(await client.my_dto_method())
+        except Exception as e:
+            print(e)
+        try:
+            print("List of DTOs")
+            print(await client.returns_list_of_dtos())
         except Exception as e:
             print(e)
 

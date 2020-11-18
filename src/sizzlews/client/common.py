@@ -35,8 +35,8 @@ RESPONSE_FIELD_EROR = 'error'
 RESPONSE_FIELD_JSONRPC = 'jsonrpc'
 
 InvocationParams = Union[Dict[str, Any], List[Any]]
-InvocationResultType = Type[pydantic.BaseModel]
-InvocationResult = pydantic.BaseModel
+InvocationResultType = Type[Union[pydantic.BaseModel, List[pydantic.BaseModel]]]
+InvocationResult = Union[pydantic.BaseModel, List[pydantic.BaseModel]]
 
 
 class JsonRpcRequest(object):
@@ -110,7 +110,9 @@ class SizzleWsBaseClient(metaclass=ABCMeta):
         rq = JsonRpcRequest(method_name, params)
         return rq
 
-    def _parse_rpc_response(self, response: Dict[str, Any], expected_response_type: InvocationResultType = None):
+    @staticmethod
+    def _parse_rpc_response(response: Dict[str, Any],
+                            expected_response_type: InvocationResultType = None) -> InvocationResult:
         if RESPONSE_FIELD_JSONRPC not in response or response[RESPONSE_FIELD_JSONRPC] != '2.0':
             raise ValueError('Unknown response format. Expected result should be in JSONRPC 2.0 format')
         if RESPONSE_FIELD_EROR in response:
@@ -119,7 +121,10 @@ class SizzleWsBaseClient(metaclass=ABCMeta):
             if expected_response_type is None:
                 return response[RESPONSE_FIELD_RESULT]
             else:
-                return expected_response_type.parse_obj(response[RESPONSE_FIELD_RESULT])
+                if isinstance(response[RESPONSE_FIELD_RESULT], list):
+                    return list(map(lambda x: expected_response_type.parse_obj(x), response[RESPONSE_FIELD_RESULT]))
+                else:
+                    return expected_response_type.parse_obj(response[RESPONSE_FIELD_RESULT])
 
 
 class SizzleWsClient(SizzleWsBaseClient, metaclass=ABCMeta):

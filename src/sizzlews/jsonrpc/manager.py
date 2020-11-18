@@ -140,8 +140,11 @@ class JSONRPCResponseAsyncManager(object):
                     result = method(*request.args, **request.kwargs)
                     if inspect.isawaitable(result):
                         result = await result
+                    # Find pydantic models and convert them to dict
                     if isinstance(result, pydantic.BaseModel):
                         result = result.dict()
+                    elif isinstance(result, list):
+                        result = [x.dict() if isinstance(x, pydantic.BaseModel) else x for x in result]
                 except JSONRPCDispatchException as e:
                     output = make_response(error=e.error._data)
                 except Exception as e:

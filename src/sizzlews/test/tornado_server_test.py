@@ -22,6 +22,7 @@
 #    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import asyncio
+from typing import List
 
 import pydantic
 
@@ -47,6 +48,9 @@ class MyApi(ClassBasedSizzleWSHandler):
 
     async def my_dto_method(self):
         return MyDTO(field1=1, field2='str')
+
+    async def returns_list_of_dtos(self) -> List[MyDTO]:
+        return [MyDTO(field1=1, field2='str'), MyDTO(field1=2, field2='str2')]
 
 
 if __name__ == "__main__":
